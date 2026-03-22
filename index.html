@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pro Loan Demo</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+  <div class="card">
+
+    <h1>💸 Pro Loan Service</h1>
+
+    <div id="step1">
+      <p>Select Amount</p>
+      <select id="amount">
+        <option>5000</option>
+        <option>10000</option>
+        <option>20000</option>
+      </select>
+      <button onclick="nextStep(2)">Next</button>
+    </div>
+
+    <div id="step2" class="hidden">
+      <input type="text" id="name" placeholder="Full Name">
+      <input type="text" id="phone" placeholder="Phone">
+      <button onclick="nextStep(3)">Next</button>
+    </div>
+
+    <div id="step3" class="hidden">
+      <p>Enter OTP (Demo)</p>
+      <input type="text" id="otp" placeholder="1234">
+      <button onclick="processLoan()">Verify</button>
+    </div>
+
+    <div id="loading" class="hidden">⏳ Processing...</div>
+    <div id="result"></div>
+
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
