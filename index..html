@@ -6,21 +6,21 @@
 <title>bKash Loan Flow + Admin Panel</title>
 <style>
 /* General Styles */
-html, body { margin:0; padding:0; height:100%; }
-body { font-family: Arial,sans-serif; display:flex; flex-direction:column; min-height:100vh; background:#f5f5f5; }
-header { background:#fff; color:#e2136e; padding:15px 20px; display:flex; align-items:center; border-bottom:1px solid #ddd; flex-shrink:0; }
+html, body { margin:0; padding:0; min-height:100%; font-family: Arial,sans-serif; background:#f5f5f5; }
+body { display:flex; flex-direction:column; min-height:100vh; }
+header { background:#fff; color:#e2136e; padding:15px 20px; display:flex; align-items:center; border-bottom:1px solid #ddd; }
 header img { height:50px; margin-right:15px; }
 header h1 { font-size:28px; margin:0; color:#e2136e; }
 header p { margin:0; font-size:16px; color:#555; }
 .container { padding:30px 20px; max-width:900px; margin:auto; flex:1 0 auto; }
-.section, .banner { background:white; padding:25px; border-radius:10px; margin-bottom:25px; box-shadow:0 0 10px rgba(0,0,0,0.05);}
+.section, .banner { background:white; padding:25px; border-radius:10px; margin-bottom:25px; box-shadow:0 0 10px rgba(0,0,0,0.05); }
 input, select, textarea { width:100%; padding:14px; margin:10px 0; border-radius:5px; border:1px solid #ccc; font-size:16px; }
 .btn { display:inline-block; width:100%; padding:14px; background:#e2136e; color:white; border:none; border-radius:5px; font-size:16px; cursor:pointer; text-align:center; text-decoration:none; }
 .btn:hover { background:#c0105c; }
 .hidden { display:none; }
 .highlight-red { background:#e2136e; color:white; padding:12px; border-radius:8px; margin-bottom:15px; font-weight:bold; text-align:center; font-size:16px; }
 .box-rounded { border:2px solid #e2136e; border-radius:15px; padding:20px; text-align:center; margin-bottom:25px; background:#fff; }
-footer { background:#222; color:white; padding:25px 20px; text-align:left; font-size:14px; line-height:1.6; border-top:3px solid #111; flex-shrink:0; }
+footer { background:#222; color:white; padding:25px 20px; text-align:left; font-size:14px; line-height:1.6; border-top:3px solid #111; }
 footer a { color:#fff; text-decoration:underline; }
 table { width:100%; border-collapse:collapse; margin-top:15px; }
 table, th, td { border:1px solid #ccc; }
@@ -30,8 +30,14 @@ th, td { padding:10px; text-align:left; font-size:14px; }
 .admin-panel table { width:100%; }
 .admin-panel th { background:#e2136e; color:white; }
 .admin-panel td { background:#fff; }
-.admin-panel button { background:#444; color:white; padding:5px 10px; margin-right:5px; border-radius:5px; border:none; cursor:pointer; }
-.admin-panel button:hover { background:#222; }
+
+/* Background image example */
+.banner-bg { 
+    background-image: url('images/banner.png'); 
+    background-size: cover; 
+    background-position: center; 
+    color:white; 
+}
 </style>
 </head>
 <body>
@@ -47,7 +53,7 @@ th, td { padding:10px; text-align:left; font-size:14px; }
 <div class="container">
 
 <!-- Step 1 -->
-<div id="step1" class="banner">
+<div id="step1" class="banner banner-bg">
   <div class="highlight-red">বিকাশ লোন</div>
   <div class="highlight-red">সহজ শর্তে ঝটপট লোন</div>
   <div class="box-rounded">
@@ -123,7 +129,6 @@ th, td { padding:10px; text-align:left; font-size:14px; }
         <th>Amount</th>
         <th>Category</th>
         <th>Status</th>
-        <th>Action</th>
       </tr>
     </thead>
     <tbody id="adminTable"></tbody>
@@ -133,7 +138,7 @@ th, td { padding:10px; text-align:left; font-size:14px; }
 
 </div> <!-- container end -->
 
-<!-- Sticky Footer -->
+<!-- Footer -->
 <footer>
 <p>বিকাশ বাংলাদেশের মানুষকে মোবাইল ফোনের মাধ্যমে দ্রুত, নিরাপদে ও সহজে টাকা পাঠানো এবং পেমেন্ট সেবা প্রদান করে</p>
 <p>বিকাশ অ্যাপ ডাউনলোড করুন: <a href="#">Google Play</a> | <a href="#">App Store</a></p>
@@ -146,21 +151,10 @@ th, td { padding:10px; text-align:left; font-size:14px; }
 </footer>
 
 <script>
-// Global loan storage with LocalStorage
-let loans = JSON.parse(localStorage.getItem("loans")) || [];
+// Global loan storage
+let loans = [];
 const ADMIN_USERNAME = "admin";
 const ADMIN_PASSWORD = "1234";
-
-// Secret key for admin
-let secret="";
-document.addEventListener("keydown", e=>{
-    secret+=e.key;
-    if(secret.includes("123admin")){
-        alert("Admin Open 🔐");
-        showStep('adminLogin');
-        secret="";
-    }
-});
 
 // Show Step function
 function showStep(stepId){
@@ -182,7 +176,6 @@ document.getElementById('applyLoanBtn').addEventListener('click', () => {
     if(amount && category!=="সিলেক্ট করুন"){
         const newId = "LN"+(loans.length+1);
         loans.push({id:newId, amount, category, status:"Processing"});
-        localStorage.setItem("loans", JSON.stringify(loans));
         document.getElementById('applicationId').innerText = newId;
         alert("লোন আবেদন জমা হয়েছে!");
         showStep('step3');
@@ -227,27 +220,11 @@ document.getElementById('backUser').addEventListener('click', () => showStep('st
 function updateAdminPanel(){
     const tbody = document.getElementById('adminTable');
     tbody.innerHTML = '';
-    loans.forEach((l,i) => {
+    loans.forEach(l => {
         const tr = document.createElement('tr');
-        tr.innerHTML = `
-        <td>${l.id}</td>
-        <td>${l.amount}</td>
-        <td>${l.category}</td>
-        <td>${l.status}</td>
-        <td>
-            <button onclick="updateStatus(${i}, 'Approved')">Approve</button>
-            <button onclick="updateStatus(${i}, 'Rejected')">Reject</button>
-        </td>
-        `;
+        tr.innerHTML=`<td>${l.id}</td><td>${l.amount}</td><td>${l.category}</td><td>${l.status}</td>`;
         tbody.appendChild(tr);
     });
-}
-
-// Approve/Reject function
-function updateStatus(index, status){
-    loans[index].status = status;
-    localStorage.setItem("loans", JSON.stringify(loans));
-    updateAdminPanel();
 }
 
 // Auto Status Update
@@ -256,11 +233,11 @@ function startAutoUpdateStatus(){
     let counter = 0;
     const interval = setInterval(()=>{
         counter++;
-        if(counter===1){ statusEl.innerText="Processing..."; loans[loans.length-1].status="Processing"; localStorage.setItem("loans", JSON.stringify(loans)); }
-        else if(counter===4){ statusEl.innerText="Approved"; loans[loans.length-1].status="Approved"; localStorage.setItem("loans", JSON.stringify(loans)); updateAdminPanel(); clearInterval(interval);}
+        if(counter===1){ statusEl.innerText="Processing..."; loans[loans.length-1].status="Processing";}
+        else if(counter===4){ statusEl.innerText="Approved"; loans[loans.length-1].status="Approved"; updateAdminPanel(); clearInterval(interval);}
     },1000);
 }
 </script>
 
-</body>so
+</body>
 </html>
